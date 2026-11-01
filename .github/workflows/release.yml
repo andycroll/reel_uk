@@ -1,0 +1,35 @@
+name: Release Gem
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
+      - run: bundle exec rake test
+      # A new gem's first release must name the RubyGems account that will own it
+      - name: Get a RubyGems key through trusted publishing
+        env:
+          RUBYGEMS_OWNER_ID: "28635"
+        run: |
+          set -o pipefail
+          jwt=$(curl --fail-with-body -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=rubygems.org" | jq -r .value)
+          key=$(jq -n --arg jwt "$jwt" --arg owner "$RUBYGEMS_OWNER_ID" '{jwt: $jwt, owner: $owner}' |
+            curl --fail-with-body -sS -X POST -H "Content-Type: application/json" -d @- \
+            https://rubygems.org/api/v1/oidc/trusted_publisher/exchange_token | jq -r .rubygems_api_key)
+          test -n "$key" && test "$key" != null
+          echo "::add-mask::$key"
+          echo "GEM_HOST_API_KEY=$key" >> "$GITHUB_ENV"
+      - uses: rubygems/release-gem@v1
+        with:
+          setup-trusted-publisher: false
