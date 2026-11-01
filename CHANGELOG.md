@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.0.0] - 2026-11-01
 
 ### Added
 - `ReelUk::Cinema.all` and `ReelUk::Cinema.new(id)` for Reel's cinemas, keyed by each venue's path on the website, from the cinema menu on the Reel home page, with addresses from each venue's page footer and coordinates from OpenStreetMap (Burnley's from its postcode).
