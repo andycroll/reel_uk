@@ -94,7 +94,7 @@ class ReelUk::PerformanceTest < Minitest::Test
   end
 
   def test_venues_on_the_old_website
-    performances = Time.stub(:now, FETCHED_AT) { performances_at('hull') }
+    performances = Cinebase::London.stub(:today, FETCHED_ON) { performances_at('hull') }
 
     assert_equal 8, performances.count
     assert_equal "#{TICKETS}34037", performances.detect { |p| p.film_name == 'Forgotten Island' }.booking_url
@@ -102,7 +102,7 @@ class ReelUk::PerformanceTest < Minitest::Test
   end
 
   def test_old_website_headings
-    performances = Time.stub(:now, FETCHED_AT) { performances_at('hull') }
+    performances = Cinebase::London.stub(:today, FETCHED_ON) { performances_at('hull') }
     doctor_who = performances.detect { |p| p.film_name == 'Doctor Who: The Satan Pit' }
 
     assert_equal %w(arts), doctor_who.variant
@@ -113,7 +113,7 @@ class ReelUk::PerformanceTest < Minitest::Test
     stub_request(:get, "#{HULL}/whatson").to_return(
       status: 200, body: website_fixture('whatson-hull.html').sub('/hull/booking/34037/', '/hull/film/')
     )
-    performances = Time.stub(:now, FETCHED_AT) { performances_at('hull') }
+    performances = Cinebase::London.stub(:today, FETCHED_ON) { performances_at('hull') }
     performance = performances.detect { |p| p.film_name == 'Forgotten Island' }
 
     assert_equal "#{HULL}/film/forgotten-island", performance.booking_url

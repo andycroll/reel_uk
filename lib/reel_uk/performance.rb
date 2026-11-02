@@ -37,7 +37,6 @@ module ReelUk
     THREE_D = Cinebase::A1web::Performance::THREE_D
     IMAX = Cinebase::A1web::Performance::IMAX
     LANGUAGE = Cinebase::A1web::Performance::LANGUAGE
-    TIME_ZONE = 'Europe/London'.freeze
 
     # The old website's own booking links only work in a browser that has
     # just visited the venue's pages, so link to the venue's Admit One
@@ -54,7 +53,7 @@ module ReelUk
     # @return [Array<ReelUk::Performance>]
     def self.at(
       cinema_id,
-      from: TZInfo::Timezone.get(TIME_ZONE).now.to_date,
+      from: Cinebase::London.today,
       to: from + 13
     )
       raise ArgumentError, 'to must not precede from' if to < from
@@ -82,9 +81,8 @@ module ReelUk
       if cinema.url.empty?
         []
       elsif cinema.a1web?
-        today = TZInfo::Timezone.get(TIME_ZONE).now.to_date
         html = Cinema.a1web_client.whats_on(cinema.url)
-        Cinebase::A1web::Listings.new(html, venue_url: cinema.url, today: today).showings
+        Cinebase::A1web::Listings.new(html, venue_url: cinema.url, today: Cinebase::London.today).showings
       else
         ReelUk::Internal::Listings.new(cinema.url).showings
       end

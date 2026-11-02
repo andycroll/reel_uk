@@ -8,7 +8,6 @@ module ReelUk
       # such as '16 Dec 2026 @ 09:30', which name every showtime on sale
       class Showtimes
         OPTION = %r{<option value="[^"]*/booknow/(\d+)/?">(\d{1,2} [A-Z][a-z]{2} \d{4}) @ (\d{1,2}):(\d{2})</option>}
-        TIME_ZONE = 'Europe/London'
 
         # @param [String] html the menu's options
         # @param [String] film_id Jacro's film id
@@ -38,7 +37,7 @@ module ReelUk
 
         def starting_at(date, hour, minute)
           local = Time.utc(date.year, date.month, date.day, hour.to_i, minute.to_i)
-          TZInfo::Timezone.get(TIME_ZONE).local_to_utc(local) { |periods| periods.first }.utc
+          Cinebase::London.utc(local)
         end
       end
     end

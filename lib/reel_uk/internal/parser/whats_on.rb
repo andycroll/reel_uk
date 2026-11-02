@@ -14,7 +14,6 @@ module ReelUk
           <a\shref="[^"]*/booknow/(\d+)/?"[^>]*>\s*(\d{1,2}:\d{2})\s*</a>
           (?:<div\sclass="show_time_label">([^<]*)</div>)?
         }x
-        TIME_ZONE = 'Europe/London'
 
         # @param [String] html a what's on page
         # @param [String] venue_url e.g. 'https://reel-cinemas.co.uk/chorley'
@@ -54,7 +53,7 @@ module ReelUk
         def starting_at(date, time)
           hour, minute = time.split(':').map(&:to_i)
           local = Time.utc(date.year, date.month, date.day, hour, minute)
-          TZInfo::Timezone.get(TIME_ZONE).local_to_utc(local) { |periods| periods.first }.utc
+          Cinebase::London.utc(local)
         end
       end
     end

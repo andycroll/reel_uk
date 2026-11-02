@@ -26,26 +26,13 @@ class ReelUk::Internal::WebsiteTest < Minitest::Test
     stub_request(:get, HOME).to_return(status: 403, body: 'secret')
 
     error = assert_raises(RuntimeError) { @website.home }
-    assert_equal 'Reel HTTP error 403 from reel-cinemas.co.uk', error.message
-  end
-
-  def test_redirects_are_not_followed
-    stub_request(:get, HOME).to_return(status: 302, headers: { 'Location' => 'https://reel-cinemas.co.uk/x' })
-
-    assert_raises(RuntimeError) { @website.home }
+    assert_equal 'HTTP error 403 from reel-cinemas.co.uk', error.message
   end
 
   def test_transient_errors_are_retried
     stub_request(:get, HOME).to_raise(Errno::ECONNRESET).then.to_return(status: 200, body: 'ok')
 
-    @website.stub(:sleep, nil) { assert_equal 'ok', @website.home }
+    Cinebase::Http.stub(:pause, nil) { assert_equal 'ok', @website.home }
     assert_requested :get, HOME, times: 2
-  end
-
-  def test_retries_give_up
-    stub_request(:get, HOME).to_raise(Net::ReadTimeout)
-
-    assert_raises(Net::ReadTimeout) { @website.stub(:sleep, nil) { @website.home } }
-    assert_requested :get, HOME, times: 3
   end
 end

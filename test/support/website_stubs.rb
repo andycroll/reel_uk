@@ -12,7 +12,7 @@ module WebsiteStubs
   SCHEDULED_FILMS = %w(3758 3760 3915).freeze
   NO_SHOWTIMES = { html: '<option disabled>No available showtimes</option>' }.to_json.freeze
   # The A1Web fixture's tabs start on this date
-  FETCHED_AT = Time.utc(2026, 11, 1, 12)
+  FETCHED_ON = Date.new(2026, 11, 1)
 
   private
 

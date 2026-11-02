@@ -6,7 +6,6 @@ require 'cinebase/a1web'
 
 require_relative './reel_uk/version'
 
-require_relative './reel_uk/internal/http'
 require_relative './reel_uk/internal/website'
 require_relative './reel_uk/internal/title_sanitizer'
 
