@@ -81,9 +81,20 @@ class ReelUk::PerformanceTest < Minitest::Test
   end
 
   def test_royal_ballet_and_opera
-    performance = performances_at('chorley').detect { |p| p.film_name == 'Royal Ballet and Opera: The Nutcracker' }
+    performance = performances_at('chorley').detect { |p| p.film_name == 'The Nutcracker' }
 
+    assert_equal 'Royal Ballet and Opera', performance.event.name
     assert_equal %w(arts), performance.variant
+  end
+
+  def test_audience_labels_in_titles
+    stub_request(:get, "#{HULL}/whatson").to_return(
+      status: 200, body: website_fixture('whatson-hull.html').sub('>Forgotten Island<', '>Relaxed Screening: Forgotten Island<')
+    )
+    performances = Cinebase::London.stub(:today, FETCHED_ON) { performances_at('hull') }
+    performance = performances.detect { |p| p.film_name == 'Forgotten Island' }
+
+    assert_equal %w(relaxed), performance.variant
   end
 
   def test_without_a_location_only_the_whats_on_page_is_read
